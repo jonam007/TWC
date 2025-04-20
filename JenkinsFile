@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    environment {
+        // Android SDK environment variables
+        ANDROID_HOME = "/home/ec2-user/Android/Sdk"
+        PATH = "${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${PATH}"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/yourusername/your-repo.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build Android Release APK') {
+            steps {
+                dir('android') {
+                    sh './gradlew assembleRelease'
+                }
+            }
+        }
+
+        stage('Archive APK') {
+            steps {
+                archiveArtifacts artifacts: 'android/app/build/outputs/apk/release/app-release.apk', fingerprint: true
+            }
+        }
+
+        stage('Upload to S3') {
+            steps {
+                sh '''
+                    aws s3 cp android/app/build/outputs/apk/release/app-release.apk s3://your-bucket-name/
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed. Check logs.'
+        }
+    }
+}
+
