@@ -6,7 +6,7 @@ pipeline {
         ANDROID_HOME = "/home/ec2-user/Android/Sdk"
         PATH = "${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${PATH}"
         // Add Node.js to PATH if installed via nvm
-        PATH = "/home/ec2-user/.nvm/versions/node/v20.x/bin:${PATH}"
+       
         
         // AWS credentials (better to use Jenkins credentials)
         AWS_ACCESS_KEY_ID = credentials('aws-access-key')
